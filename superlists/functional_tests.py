@@ -33,14 +33,21 @@ class NewVisitorTest(unittest.TestCase):
         # hits enter, the page updates, and the page now lists the item as a to-do
         inputbox.send_keys(Keys.ENTER)
         
+        # import time; time.sleep(10)
         table = self.browser.find_element_by_id('id_list_table')
         rows = table.find_elements_by_tag_name('tr')
-        self.assertTrue(
-            any(row.text == '1: Buy peacock feathers' for row in rows),
-            "New to-do item didn't appear in table"
-        )
+        self.assertIn("1: Buy peacock feathers", [row.text for row in rows])
 
         # the entry text box is still there, use it to enter a to-do to make a fly fishing lure
+        inputbox = self.browser.find_element_by_id('id_new_item')
+        inputbox.send_keys('Use peacock feathers to make a fly')
+        inputbox.send_keys(Keys.ENTER)
+        
+        # the page updates again, to show both items on the list
+        table = self.browser.find_element_by_id('id_list_table')
+        rows = table.find_elements_by_tag_name('tr')
+        self.assertIn("2: Use peacock feathers to make a fly", [row.text for row in rows])
+        
         self.fail('Finish the test')
 
         # the page updates again, and now shows both items
