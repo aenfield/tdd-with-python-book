@@ -65,7 +65,7 @@ class NewVisitorTest(LiveServerTestCase):
         # Francis starts a new list by entering an item
         inputbox = self.browser.find_element_by_id('id_new_item')
         inputbox.send_keys('Buy milk')
-        inputbox.self(Keys.ENTER)
+        inputbox.send_keys(Keys.ENTER)
         
         # Francis has his own URL
         francis_list_url = self.browser.current_url
