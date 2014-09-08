@@ -55,12 +55,12 @@ WSGI_APPLICATION = 'superlists.wsgi.application'
 
 
 # Database
-# https://docs.djangoproject.com/en/1.7/ref/settings/#databases
+# https://docs.djangoproject.com/en/1.7/ref/settings/#settings
 
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
+        'NAME': os.path.join(BASE_DIR, '../database/db.sqlite3'),
     }
 }
 
@@ -82,4 +82,4 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/1.7/howto/static-files/
 
 STATIC_URL = '/static/'
-STATIC_ROOT = os.path.abspath(os.path.join(BASE_DIR, '../../static-superlists'))  # used by collectstatic to copy files for deployment (typically outside the repos, which is why we go up a few levels)
+STATIC_ROOT = os.path.abspath(os.path.join(BASE_DIR, '../static'))  # used by collectstatic to copy files for deployment (typically outside the repos, which is why we go up a few levels)
