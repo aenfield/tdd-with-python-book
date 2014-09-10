@@ -2,35 +2,20 @@ from django.test import TestCase
 from django.core.exceptions import ValidationError
 from lists.models import Item, List
 
-class ListAndItemModelsTest(TestCase):
+class ItemModelTest(TestCase):
     
-    def test_saving_and_retrieving_items(self):
-        list_ = List()  # end with _ to avoid shadowing 'list' function (ok...)
-        list_.save()
+    def test_default_text_to_sanity_check_model_is_setup(self):
+        item = Item()
+        self.assertEqual(item.text, '')
         
-        first_item = Item()
-        first_item.text = 'The first (ever) list item'
-        first_item.list = list_
-        first_item.save()
         
-        second_item = Item()
-        second_item.text = 'Item the second'
-        second_item.list = list_
-        second_item.save()
-        
-        saved_list = List.objects.first()
-        self.assertEqual(saved_list, list_)
-        
-        saved_items = Item.objects.all()
-        self.assertEqual(saved_items.count(), 2)
-        
-        first_saved_item = saved_items[0]
-        second_saved_item = saved_items[1]
-        self.assertEqual(first_saved_item.text, 'The first (ever) list item')
-        self.assertEqual(first_saved_item.list, list_)
-        self.assertEqual(second_saved_item.text, 'Item the second')
-        self.assertEqual(second_saved_item.list, list_)
-        
+    def test_item_is_related_to_list(self):
+        list_ = List.objects.create()
+        item = Item()
+        item.list = list_
+        item.save()
+        self.assertIn(item, list_.item_set.all())
+
         
     def test_cannot_save_empty_list_items(self):
         list_ = List.objects.create()
@@ -40,6 +25,43 @@ class ListAndItemModelsTest(TestCase):
             item.full_clean()
             
             
+    def test_duplicate_items_are_invalid(self):
+        list_ = List.objects.create()
+        Item.objects.create(list=list_, text='bla')
+        with self.assertRaises(ValidationError):
+            item = Item(list=list_, text='bla')
+            item.full_clean()
+            # Note that when we do a item.save, the uniqueness constraint on Item is enforced by the database (not Django as here) and the exception is of type sqlite3.IntegrityError, not ValidationError
+            
+            
+    def test_can_save_same_item_to_different_lists(self):
+        list1 = List.objects.create()
+        list2 = List.objects.create()
+        Item.objects.create(list=list1, text='foo')
+        item = Item(list=list2, text='foo')
+        item.full_clean()   # shouldn't raise ValidationError, since it's in a different list
+        
+        
+    def test_list_ordering(self):
+        list1 = List.objects.create()
+        item1 = Item.objects.create(list=list1, text='i1')
+        item2 = Item.objects.create(list=list1, text='item 2')
+        item3 = Item.objects.create(list=list1, text='3')
+        self.assertEqual(
+            list(Item.objects.all()), # convert to list so we can compare easily
+            [item1, item2, item3]
+        )
+        
+        
+    def test_string_representation(self):
+        item = Item(text='some text')
+        self.assertEqual(str(item), 'some text')
+        
+
+class ListModelTest(TestCase):
+    
     def test_get_absolute_url(self):
         list_ = List.objects.create()
         self.assertEqual(list_.get_absolute_url(), '/lists/%d/' % (list_.id,))
+        
+        
