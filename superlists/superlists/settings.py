@@ -83,3 +83,6 @@ USE_TZ = True
 
 STATIC_URL = '/static/'
 STATIC_ROOT = os.path.abspath(os.path.join(BASE_DIR, '../../static'))  # used by collectstatic to copy files for deployment (typically outside the repos, which is why we go up a few levels)
+STATICFILES_DIRS = (
+    os.path.join(BASE_DIR, 'superlists', 'static'),
+)
