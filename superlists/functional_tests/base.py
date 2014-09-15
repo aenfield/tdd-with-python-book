@@ -53,6 +53,11 @@ class FunctionalTest(StaticLiveServerTestCase):
         navbar = self.browser.find_element_by_css_selector('.navbar')
         self.assertIn(email, navbar.text)
 
+    
+    def wait_to_be_logged_out(self, email):
+        self.wait_for_element_with_id('id_login')
+        navbar = self.browser.find_element_by_css_selector('.navbar')
+        self.assertNotIn(email, navbar.text)
 
         
         
